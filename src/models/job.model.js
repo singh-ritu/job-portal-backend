@@ -29,6 +29,10 @@ const jobSchema = new mongoose.Schema({
       enum: ["Junior", "Mid", "Senior"],
       required: [true, "Experience level is required"],
     },
+    // isActive:{
+    //     type: Boolean,
+    //     default: true,
+    // },
     postedBy:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

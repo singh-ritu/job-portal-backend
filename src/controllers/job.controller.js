@@ -81,3 +81,45 @@ export const getJobsByEmployer = async (req, res, next) => {
     }
 }
 
+export const getAllJobs = async (req, res, next) => {
+    
+    try {
+
+         const page = Number(req.query.page) || 1;
+         const limit = Number(req.query.limit) || 10;
+
+            const keyword = req.query.keyword || "";
+            const location = req.query.location || "";
+
+            const skip = (page - 1) * limit;
+
+            const query = {};
+
+            if (keyword) {
+                query.title = { $regex: keyword, $options: "i" };
+            }
+
+            if (location) {
+                query.location = location;
+            }
+        
+            const jobs = await Job.find(query)
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 });
+
+            const totalJobs = await Job.countDocuments(query);
+
+        return res.status(200).json({
+            success:true,
+            totalJobs,
+            currentPage: page,
+            totalPages: Math.ceil(totalJobs / limit),
+            jobs,
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+
