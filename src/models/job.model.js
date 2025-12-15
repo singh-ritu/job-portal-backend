@@ -20,6 +20,11 @@ const jobSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+        jobType: {
+        type: String,
+        enum: ["Full-time", "Part-time", "Internship", "Contract", "Freelance"],
+        default: "Full-time",
+    },
     salary:{
         type: Number,
         required: true,
@@ -29,10 +34,10 @@ const jobSchema = new mongoose.Schema({
       enum: ["Junior", "Mid", "Senior"],
       required: [true, "Experience level is required"],
     },
-    // isActive:{
-    //     type: Boolean,
-    //     default: true,
-    // },
+    isActive:{
+        type: Boolean,
+        default: true,
+    },
     postedBy:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

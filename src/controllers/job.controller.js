@@ -2,14 +2,14 @@ import Job from "../models/job.model.js";
 
 export const createJob = async(req, res, next) => {
     try {
-        const {title, description, location, company, salary, experienceLevel} = req.body
+        const {title, description, location, company, jobType, salary, experienceLevel, isActive} = req.body
 
-        if( !title || !description || !location || !company || salary ===undefined || !experienceLevel){
+        if( !title || !description || !location || !company || !jobType || salary === null || !experienceLevel || isActive === null){
             return res.status(400).json({message:"All required fields must be provided"})
         }
 
         const job = new Job({
-            title, description, location, company, salary, experienceLevel, postedBy:req.user._id
+            title, description, location, company, jobType, salary, experienceLevel, isActive, postedBy:req.user._id
         });
 
         await job.save();
@@ -36,7 +36,7 @@ export const updateJob = async (req, res, next) => {
             return res.status(403).json({message:"Unauthorized to update this job"})
         }
 
-        const allowedUpdates = ["title", "description", "location", "company", "salary", "experienceLevel"];
+        const allowedUpdates = ["title", "description", "location", "company","jobType","isActive", "salary", "experienceLevel"];
         allowedUpdates.forEach((field) => {
             if(update[field] !== undefined){
                 job[field] = update[field];
@@ -93,7 +93,7 @@ export const getAllJobs = async (req, res, next) => {
 
             const skip = (page - 1) * limit;
 
-            const query = {};
+            const query = {isActive: true};
 
             if (keyword) {
                 query.title = { $regex: keyword, $options: "i" };
