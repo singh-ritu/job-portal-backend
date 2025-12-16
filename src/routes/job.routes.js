@@ -8,10 +8,8 @@ const router = express.Router();
 
 router.post("/", verifyToken, employerOnly,createJob);
 router.get("/my-jobs", verifyToken, employerOnly, getJobsByEmployer);
-
-router.put("/:job-id", verifyToken, employerOnly, updateJob);
-
-router.delete(" /:job-id", verifyToken, employerOnly, deleteJob);
+router.put("/:jobId", verifyToken, employerOnly, updateJob);
+router.delete("/:jobId", verifyToken, employerOnly, deleteJob);
 
 router.get("/", getAllJobs)
 

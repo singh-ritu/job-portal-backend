@@ -69,6 +69,8 @@ const loginUser = async (req, res) =>{
                 name: existingUser.name,
                 email: existingUser.email,
                 role: existingUser.role,
+                jobType: existingUser.jobType,
+                experienceLevel: existingUser.experienceLevel,
             },
         })
 
