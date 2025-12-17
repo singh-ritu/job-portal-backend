@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import connectDB from "./src/config/db.js";
 import authRoutes from "./src/routes/auth.routes.js";
 import jobRoutes from "./src/routes/job.routes.js";
@@ -9,7 +10,12 @@ const app = express();
 connectDB();
 
 app.use(express.json());
-
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true, // safe even if not used
+  })
+);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
