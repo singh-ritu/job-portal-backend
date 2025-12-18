@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDB from "./src/config/db.js";
 import authRoutes from "./src/routes/auth.routes.js";
 import jobRoutes from "./src/routes/job.routes.js";
+import uploadRoutes from "./src/routes/upload.routes.js";
 dotenv.config(); 
 
 const app = express();
@@ -19,6 +20,7 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
+app.use("/api/upload", uploadRoutes);
 
 
 
