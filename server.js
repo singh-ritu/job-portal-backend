@@ -5,6 +5,8 @@ import connectDB from "./src/config/db.js";
 import authRoutes from "./src/routes/auth.routes.js";
 import jobRoutes from "./src/routes/job.routes.js";
 import uploadRoutes from "./src/routes/upload.routes.js";
+import applicationRoutes from "./src/routes/application.routes.js";
+import userRoutes from "./src/routes/user.routes.js";
 dotenv.config(); 
 
 const app = express();
@@ -21,6 +23,8 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/applications", applicationRoutes);
+app.use("/api/users", userRoutes);
 
 
 
