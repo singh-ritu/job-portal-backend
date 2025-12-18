@@ -23,7 +23,15 @@ const userSchema = new mongoose.Schema({
         enum: ['jobseeker', 'employer'],
         default: 'jobseeker',
         required: true,
-    }
+    },
+    resumeUrl:{
+        type:String,
+        default: null,
+    },
+    skills:{
+        type: [String],
+        default: [],
+    },
 }, {timestamps: true})
 
 userSchema.methods.matchPassword = async function(password) {
