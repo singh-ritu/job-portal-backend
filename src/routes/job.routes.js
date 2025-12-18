@@ -1,6 +1,6 @@
 import express from 'express';
 
-import{ createJob, updateJob, deleteJob, getJobsByEmployer, getAllJobs} from '../controllers/job.controller.js';
+import{ createJob, updateJob, deleteJob, getJobsByEmployer, getAllJobs, getJobById} from '../controllers/job.controller.js';
 import verifyToken from '../middlewares/auth.middleware.js';
 import employerOnly from '../middlewares/role.middleware.js';
 
@@ -12,5 +12,6 @@ router.put("/:jobId", verifyToken, employerOnly, updateJob);
 router.delete("/:jobId", verifyToken, employerOnly, deleteJob);
 
 router.get("/", getAllJobs)
+router.get("/:jobId", getJobById)
 
 export default router;
