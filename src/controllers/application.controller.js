@@ -42,7 +42,7 @@ export const appliedJob = async (req, res) => {
     }
 }
 
-export const getqMyApplications = async (req, res) => {
+export const getMyApplications = async (req, res) => {
     try {
         const userId = req.user._id;
 

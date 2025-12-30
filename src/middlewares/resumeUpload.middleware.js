@@ -25,12 +25,12 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const uploadResume = multer({
+export const uploadResume = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 2 * 1024 * 1024 // 2 MB
+    fileSize: 2 * 1024 * 1024
   }
 });
 
-export default uploadResume;
+
