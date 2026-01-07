@@ -61,9 +61,17 @@ const loginUser = async (req, res) =>{
             {expiresIn: "1d"}
         );
 
+        console.log("role:", existingUser.role);
+        res.cookie("token", token, {
+                httpOnly: true,
+                secure: false, // true in production
+                sameSite: "lax",
+                maxAge: 24 * 60 * 60 * 1000, // 1 day
+                path:"/",
+            });
+            
         res.json({
             message: "Login successful",
-            token,
             user: {
                 _id: existingUser._id,
                 name: existingUser.name,
@@ -81,6 +89,11 @@ const loginUser = async (req, res) =>{
     }
 }
 
-
-
-export { registerUser, loginUser };
+const getMe = async (req,res) => {
+    try {
+    return res.status(200).json(req.user);
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to fetch user" });
+  }
+}
+export { registerUser, loginUser, getMe };

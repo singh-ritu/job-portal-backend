@@ -1,18 +1,22 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import connectDB from "./src/config/db.js";
 import authRoutes from "./src/routes/auth.routes.js";
 import jobRoutes from "./src/routes/job.routes.js";
 import uploadRoutes from "./src/routes/upload.routes.js";
 import applicationRoutes from "./src/routes/application.routes.js";
 import userRoutes from "./src/routes/user.routes.js";
+import multer from "multer";
 dotenv.config(); 
 
 const app = express();
+app.use(express.json());
+
 connectDB();
 
-app.use(express.json());
+app.use(cookieParser());
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -27,9 +31,22 @@ app.use("/api/applications", applicationRoutes);
 app.use("/api/users", userRoutes);
 
 
-
+app.get("/api/debug-cookies", (req, res) => {
+  console.log("COOKIES:", req.cookies);
+  res.json(req.cookies);
+});
 app.get("/", (req, res) => {
   res.send("Backend server is running...");
+});
+
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ message: err.message });
+  }
+  if (err) {
+    return res.status(400).json({ message: err.message });
+  }
+  next();
 });
 
 

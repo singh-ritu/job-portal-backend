@@ -7,7 +7,7 @@ export const employerOnly = (req, res, next) => {
 
 
 export const jobSeekerOnly = (req, res, next) => {
-    if (!req.user || req.user.role !== 'jobSeeker') {
+    if (!req.user || req.user.role !== 'jobseeker') {
         return res.status(403).json({ message: 'Unauthorized: Job Seeker access required' });
     }
     next();

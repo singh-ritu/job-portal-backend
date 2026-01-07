@@ -1,12 +1,16 @@
 import mongoose from "mongoose";
-import Application from "../models/application.model.js";
+import Application from "../models/application.model.js"
 import Job from "../models/job.model.js";
 
 export const appliedJob = async (req, res) => {
     try {
+        
         const {jobId} = req.params;
         const userId = req.user._id;
-        const {resumeURl} = req.body;
+        const {resumeUrl} = req.body;
+        console.log("resumeURl body", req.body);
+        console.log("resumeURl", resumeUrl);
+        console.log("Applying user:", userId, "for job:", jobId);
 
         if (!mongoose.Types.ObjectId.isValid(jobId)) {
             return res.status(400).json({message: "Invalid Job Id"});
@@ -17,22 +21,27 @@ export const appliedJob = async (req, res) => {
             return res.status(404).json({message: "Job not found or is inactive"});
         }
 
-        const finalResumeUrl = resumeURl || req.user.resumeURl;
+        const finalResumeUrl = resumeUrl || req.user.resumeUrl;
         if(!finalResumeUrl){
             return res.status(400).json({message: "Resume URL is required to apply for the job"});
         }
+        console.log("Final Resume URL:", finalResumeUrl);
 
-        const alreadyApplied = await Application.findOne({jobId, userId});
+        const alreadyApplied = await Application.findOne({ 
+            job: jobId,
+            applicant: userId,
+        });
         if(alreadyApplied){
             return res.status(409).json({message: "You have already applied for this job"});
         }
-        const application = await Application.create({
+        const newApplication = await Application.create({
             job:jobId,
-            user: userId,
-            resumeURl: finalResumeUrl
+            applicant: userId,
+            resumeUrl: finalResumeUrl,
+            status: "Applied"
         })
-
-        return res.status(201).json({message: "Application submitted successfully", applicationId: application._id});
+        console.log("Application created with ID:", newApplication)
+        return res.status(201).json({message: "Application submitted successfully", applicationId: newApplication._id});
 
     } catch (error) {
         if (error.code === 11000) {

@@ -101,7 +101,7 @@ export const getAllJobs = async (req, res, next) => {
             }
 
             if (location) {
-                console.log(query.location);
+                // console.log(query.location);
                 query.location = {$regex: location, $options: "i"};
             }
             if (jobType) {
@@ -131,10 +131,10 @@ export const getAllJobs = async (req, res, next) => {
 
 export const getJobById = async (req, res, next) => {
   try {
-    console.log(req.params);
+    // console.log(req.params);
     const { jobId } = req.params;
 
-    console.log("JOB ID PARAM:", jobId); // MUST log
+    // console.log("JOB ID PARAM:", jobId); // MUST log
 
     const job = await Job.findById(jobId);
 

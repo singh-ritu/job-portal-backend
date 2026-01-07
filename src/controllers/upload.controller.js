@@ -1,5 +1,7 @@
 export const uploadResumeController = async (req, res) => {
+  
    try {
+    console.log("File info:", req.file);
     if (!req.file) {
       return res.status(400).json({
         message: "Resume file is required"

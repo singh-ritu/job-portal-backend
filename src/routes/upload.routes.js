@@ -4,6 +4,7 @@ import verifyToken from "../middlewares/auth.middleware.js";
 import {jobSeekerOnly} from "../middlewares/role.middleware.js";
 import { uploadResumeController } from "../controllers/upload.controller.js";
 
+
 const router = express.Router();
 
 router.post(
