@@ -10,7 +10,7 @@ const registerUser = async (req, res) => {
             return res.status(400).json({message: "All fields are required"})
         }
         
-        const emailExists = await user.findOne({email});
+        const emailExists = await User.findOne({email});
         if(emailExists){
             return res.status(400).json({message: "Email already exists"}) 
         }
@@ -21,7 +21,7 @@ const registerUser = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        await user.create({
+        await User.create({
             name,
             email,
             password: hashedPassword,
@@ -45,7 +45,7 @@ const loginUser = async (req, res) =>{
             return res.status(400).json({message:"All fields are required"})
         }
 
-        const existingUser = await user.findOne({email})
+        const existingUser = await User.findOne({email})
         if(!existingUser){
             return res.status(400).json({message:"User does not exist"})
         }

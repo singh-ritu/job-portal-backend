@@ -14,7 +14,7 @@ export const createJob = async(req, res, next) => {
 
         await job.save();
 
-        return res.status(201).json({message:"job created successfully", job})
+        return res.status(201).json({message:"job created successfully", job, success:true})
 
     } catch (error) {
         next(error)
@@ -44,7 +44,7 @@ export const updateJob = async (req, res, next) => {
         });
         await job.save();
 
-        return res.status(200).json({message:"Job updated successfully", job})
+        return res.status(200).json({message:"Job updated successfully", job, success:true})
     } catch (error) {
         next(error)
     }
@@ -65,7 +65,7 @@ export const deleteJob = async (req, res, next) => {
 
         await job.deleteOne();
 
-        return res.status(200).json({message:"Job deleted successfully"})
+        return res.status(200).json({message:"Job deleted successfully", success:true})
 
     } catch (error) {
         next(error)
@@ -75,7 +75,7 @@ export const getJobsByEmployer = async (req, res, next) => {
     try {
         const jobs = await Job.find({ postedBy: req.user._id }).sort({ createdAt: -1 });
 
-        res.status(200).json({ jobs });
+        res.status(200).json({ jobs , success:true});
     } catch (error) {
         next(error)
     }
@@ -101,7 +101,7 @@ export const getAllJobs = async (req, res, next) => {
             }
 
             if (location) {
-                // console.log(query.location);
+     
                 query.location = {$regex: location, $options: "i"};
             }
             if (jobType) {
@@ -131,10 +131,8 @@ export const getAllJobs = async (req, res, next) => {
 
 export const getJobById = async (req, res, next) => {
   try {
-    // console.log(req.params);
-    const { jobId } = req.params;
 
-    // console.log("JOB ID PARAM:", jobId); // MUST log
+    const { jobId } = req.params;
 
     const job = await Job.findById(jobId);
 

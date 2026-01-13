@@ -1,4 +1,5 @@
 export const employerOnly = (req, res, next) => {
+    console.log("Role Middleware - User:", req.user);
     if(!req.user || req.user.role  !== 'employer') {
         return res.status(403).json({ message: 'Unauthorized: Employer access required' });
     }
