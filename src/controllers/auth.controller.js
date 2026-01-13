@@ -1,4 +1,4 @@
-import user from "../models/user.model.js";
+import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
@@ -90,10 +90,19 @@ const loginUser = async (req, res) =>{
 }
 
 const getMe = async (req,res) => {
-    try {
-    return res.status(200).json(req.user);
-  } catch (error) {
-    return res.status(500).json({ message: "Failed to fetch user" });
+    
+     try {
+    const user = await User.findById(req.user._id).select(
+      "-password"
+    );
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ user });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch user" });
   }
 }
 export { registerUser, loginUser, getMe };

@@ -14,4 +14,5 @@ router.delete("/:jobId", verifyToken, employerOnly, deleteJob);
 router.get("/", getAllJobs)
 router.get("/:jobId", getJobById)
 
+
 export default router;

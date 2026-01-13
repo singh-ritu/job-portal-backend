@@ -1,8 +1,9 @@
 import express from "express";  
 import verifyToken from "../middlewares/auth.middleware.js";
 import {jobSeekerOnly} from "../middlewares/role.middleware.js";          
-import { appliedJob } from "../controllers/application.controller.js";
-import { getMyApplications } from "../controllers/application.controller.js";
+
+import {getMyApplications, appliedJob} from "../controllers/application.controller.js";
+
 
 const router = express.Router();
 

@@ -8,9 +8,7 @@ export const appliedJob = async (req, res) => {
         const {jobId} = req.params;
         const userId = req.user._id;
         const {resumeUrl} = req.body;
-        console.log("resumeURl body", req.body);
-        console.log("resumeURl", resumeUrl);
-        console.log("Applying user:", userId, "for job:", jobId);
+       
 
         if (!mongoose.Types.ObjectId.isValid(jobId)) {
             return res.status(400).json({message: "Invalid Job Id"});
@@ -32,13 +30,12 @@ export const appliedJob = async (req, res) => {
             applicant: userId,
         });
         if(alreadyApplied){
-            return res.status(409).json({message: "You have already applied for this job"});
+            return res.status(409).json({message: "You have already applied for this job", hasApplied: true});
         }
         const newApplication = await Application.create({
             job:jobId,
             applicant: userId,
             resumeUrl: finalResumeUrl,
-            status: "Applied"
         })
         console.log("Application created with ID:", newApplication)
         return res.status(201).json({message: "Application submitted successfully", applicationId: newApplication._id});
@@ -54,16 +51,17 @@ export const appliedJob = async (req, res) => {
 export const getMyApplications = async (req, res) => {
     try {
         const userId = req.user._id;
+        // console.log("Fetching applications for user ID:", userId);
 
-        const applications  = await Application.find({user:userId})
+        const applications  = await Application.find({applicant:userId})
         .populate('job')
         .sort({appliedAt: -1});
 
-        return res.status(200).json({
-            count:applications.length,
-            applications
-        })
+        // console.log("applications fetched:", applications);
+        return res.status(200).json( applications)
+
     } catch (error) {
         return res.status(500).json({message: "Internal Server Error"});
     }
 }
+
