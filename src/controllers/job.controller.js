@@ -1,4 +1,5 @@
 import Job from "../models/job.model.js";
+import mongoose from "mongoose";
 
 export const createJob = async(req, res, next) => {
     try {
@@ -72,9 +73,29 @@ export const deleteJob = async (req, res, next) => {
     }
 }
 export const getJobsByEmployer = async (req, res, next) => {
+    const employerId = req.user._id;
     try {
-        const jobs = await Job.find({ postedBy: req.user._id }).sort({ createdAt: -1 });
-
+        const jobs = await Job.aggregate([
+           { $match: { postedBy: new mongoose.Types.ObjectId(employerId) } },
+    {
+      $lookup: {
+        from: "applications",
+        localField: "_id",
+        foreignField: "job",
+        as: "applications",
+      },
+    },
+    {
+      $addFields: {
+        applicantsCount: { $size: "$applications" },
+      },
+    },
+    {
+      $project: {
+        applications: 0,
+      },
+    },
+        ])
         res.status(200).json({ jobs , success:true});
     } catch (error) {
         next(error)

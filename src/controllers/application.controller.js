@@ -51,7 +51,6 @@ export const appliedJob = async (req, res) => {
 export const getMyApplications = async (req, res) => {
     try {
         const userId = req.user._id;
-        // console.log("Fetching applications for user ID:", userId);
 
         const applications  = await Application.find({applicant:userId})
         .populate('job')
@@ -65,3 +64,30 @@ export const getMyApplications = async (req, res) => {
     }
 }
 
+export const getApplicantsByJob =  async (req, res, next) => {
+    try {
+    const { jobId } = req.params;
+
+    // Ensure employer owns the job
+    const job = await Job.findOne({
+      _id: jobId,
+      postedBy: req.user._id,
+    });
+
+    if (!job) {
+      return res.status(403).json({ message: "Unauthorized access" });
+    }
+
+    const applications = await Application.find({ job: jobId })
+      .populate("applicant", "name email")
+      .sort({ createdAt: -1 });
+    console.log("Applicants fetched:", applications);
+    res.json({
+      applicants: applications,
+      success: true,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch applicants" });
+  }
+
+}
