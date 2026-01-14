@@ -27,7 +27,7 @@ const registerUser = async (req, res) => {
             password: hashedPassword,
             role,
         });
-
+        
         return res.status(201).json({message: "User registered successfully"});
 
         } catch (error) {
@@ -105,4 +105,17 @@ const getMe = async (req,res) => {
     res.status(500).json({ message: "Failed to fetch user" });
   }
 }
-export { registerUser, loginUser, getMe };
+
+const logoutUser = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false 
+  });
+
+  return res.status(200).json({
+    message: "Logged out successfully"
+  });
+};
+
+export { registerUser, loginUser, getMe, logoutUser };

@@ -20,7 +20,7 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: "http://localhost:3000",
-    credentials: true, // safe even if not used
+    credentials: true,
   })
 );
 
@@ -29,6 +29,7 @@ app.use("/api/jobs", jobRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/users", userRoutes);
+
 
 
 app.get("/api/debug-cookies", (req, res) => {
