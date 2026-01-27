@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-
+import { USER_ENUMS } from '../enums/user.enums.js';
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -16,14 +16,20 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: function () {
+            return this.authProvider === "local";
+        },
     },
     role: {
         type: String,
-        enum: ['jobSeeker', 'employer'],
-        default: 'jobSeeker',
-        required: true,
-    }
+        enum: [USER_ENUMS.EMPLOYER, USER_ENUMS.JOB_SEEKER],
+        default: null,
+    },
+    authProvider: {
+        type: String,
+        enum: ["local", "google"],
+        required: true
+    },
 }, { timestamps: true })
 
 userSchema.methods.matchPassword = async function (password) {

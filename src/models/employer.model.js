@@ -1,15 +1,20 @@
 import mongoose from "mongoose";
 
 const employerSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+    unique: true,
+  },
   companyName: {
     type: String,
-    required: true,
     trim: true,
+    default: ""
   },
   experienceLevel: {
     type: String,
     enum: ['Entry', 'Mid', 'Senior', 'Director', 'Executive'],
-    required: true,
   },
   aboutCompany: {
     type: String,

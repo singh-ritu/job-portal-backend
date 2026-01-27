@@ -1,6 +1,12 @@
 import mongoose from "mongoose";
 
 const jobSeekerSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+    unique: true,
+  },
   resumeUrl: {
     type: String,
     default: null,
@@ -11,6 +17,6 @@ const jobSeekerSchema = new mongoose.Schema({
   },
 })
 
-const jobSeeker = mongoose.model("jobSeeker", jobSeekerSchema)
+const JobSeeker = mongoose.model("JobSeeker", jobSeekerSchema)
 
-export default jobSeeker;
+export default JobSeeker;
