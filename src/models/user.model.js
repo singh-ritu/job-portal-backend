@@ -1,41 +1,39 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-
+import { USER_ENUMS } from '../enums/user.enums.js';
 
 const userSchema = new mongoose.Schema({
-    name:{
-        type : String,
-        required : true,
+    name: {
+        type: String,
+        required: true,
         trim: true,
     },
-    email:{
+    email: {
         type: String,
         required: true,
         unique: true,
         lowercase: true,
     },
-    password:{
+    password: {
         type: String,
-        required: true,
+        required: function () {
+            return this.authProvider === "local";
+        },
     },
-    role:{
+    role: {
         type: String,
-        enum: ['jobseeker', 'employer'],
-        default: 'jobseeker',
-        required: true,
-    },
-    resumeUrl:{
-        type:String,
+        enum: [USER_ENUMS.EMPLOYER, USER_ENUMS.JOB_SEEKER],
         default: null,
     },
-    skills:{
-        type: [String],
-        default: [],
+    authProvider: {
+        type: String,
+        enum: ["local", "google"],
+        required: true
     },
-}, {timestamps: true})
+}, { timestamps: true })
 
-userSchema.methods.matchPassword = async function(password) {
-  return await bcrypt.compare(password, this.password);
+userSchema.methods.matchPassword = async function (password) {
+    return await bcrypt.compare(password, this.password);
 };
 
 const User = mongoose.model("User", userSchema);

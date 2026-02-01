@@ -1,121 +1,141 @@
 import User from "../models/user.model.js";
+import JobSeeker from "../models/jobSeeker.model.js";
+import Employer from "../models/employer.model.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { USER_ENUMS } from '../enums/user.enums.js'
+
 
 const registerUser = async (req, res) => {
-    try {
-        const  { name, email, password, role } = req.body;
+	try {
+		const { name, email, password, role } = req.body;
 
-        if(!name || !email || !password || !role){
-            return res.status(400).json({message: "All fields are required"})
-        }
-        
-        const emailExists = await User.findOne({email});
-        if(emailExists){
-            return res.status(400).json({message: "Email already exists"}) 
-        }
+		if (!name || !email || !password || !role) {
+			return res.status(400).json({ message: "All fields are required" })
+		}
 
-        if(password.length < 6){
-            return res.status(400).json({message: "Password must be at least 6 characters long"})
-        }
+		const emailExists = await User.findOne({ email });
+		if (emailExists) {
+			return res.status(400).json({ message: "Email already exists" })
+		}
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+		if (password.length < 6) {
+			return res.status(400).json({ message: "Password must be at least 6 characters long" })
+		}
 
-        await User.create({
-            name,
-            email,
-            password: hashedPassword,
-            role,
-        });
-        
-        return res.status(201).json({message: "User registered successfully"});
+		const hashedPassword = await bcrypt.hash(password, 10);
 
-        } catch (error) {
-        console.error("Error in user registration:", error);
-        return res.status(500).json({message: "Internal Server Error"});
-    }
+		const user = await User.create({
+			name,
+			email,
+			password: hashedPassword,
+			authProvider: "local",
+			role,
+		});
+		if (role === USER_ENUMS.JOB_SEEKER) {
+			JobSeeker.create({
+				userId: user._id,
+				skills: [],
+				resumeUrl: null,
+			})
+		} else if (role === USER_ENUMS.EMPLOYER) {
+			Employer.create({
+				userId: user._id,
+				companyName: "",
+				experienceLevel: "Entry",
+				aboutCompany: null,
+			})
+		}
+
+		return res.status(201).json({ message: "User registered successfully", success: true });
+
+	} catch (error) {
+		console.error("Error in user registration:", error);
+		return res.status(500).json({ message: "Internal Server Error" });
+	}
 }
 
 
-const loginUser = async (req, res) =>{
-    try {
-        const {email,password} = req.body;
+const loginUser = async (req, res) => {
+	try {
+		const { email, password } = req.body;
+		console.log("body:", req.body)
+		if (!email || !password) {
+			return res.status(400).json({ message: "All fields are required" })
+		}
 
-        if(!email || !password){
-            return res.status(400).json({message:"All fields are required"})
-        }
+		const existingUser = await User.findOne({ email })
+		if (!existingUser) {
+			return res.status(400).json({ message: "User does not exist" })
+		}
+		console.log("user:", existingUser)
+		const isPasswordCorrect = await existingUser.matchPassword(password)
+		if (!isPasswordCorrect) {
+			return res.status(400).json({ message: "Invalid credentials" })
+		}
 
-        const existingUser = await User.findOne({email})
-        if(!existingUser){
-            return res.status(400).json({message:"User does not exist"})
-        }
+		const token = jwt.sign(
+			{ _id: existingUser._id, role: existingUser.role },
+			process.env.JWT_SECRET,
+			{ expiresIn: "1d" }
+		);
 
-        const isPasswordCorrect  = await existingUser.matchPassword(password)
-        if(!isPasswordCorrect){
-            return res.status(400).json({message:"Invalid credentials"})
-        }
+		res.cookie("token", token, {
+			httpOnly: true,
+			secure: false,
+			sameSite: "lax",
+			maxAge: 24 * 60 * 60 * 1000,
+			path: "/",
+		});
 
-        const token = jwt.sign(
-            {_id : existingUser._id, role: existingUser.role},
-            process.env.JWT_SECRET,
-            {expiresIn: "1d"}
-        );
-
-        console.log("role:", existingUser.role);
-        res.cookie("token", token, {
-                httpOnly: true,
-                secure: false, // true in production
-                sameSite: "lax",
-                maxAge: 24 * 60 * 60 * 1000, // 1 day
-                path:"/",
-            });
-            
-        res.json({
-            message: "Login successful",
-            user: {
-                _id: existingUser._id,
-                name: existingUser.name,
-                email: existingUser.email,
-                role: existingUser.role,
-                jobType: existingUser.jobType,
-                experienceLevel: existingUser.experienceLevel,
-            },
-        })
+		res.json({
+			message: "Login successful",
+			user: {
+				_id: existingUser._id,
+				name: existingUser.name,
+				email: existingUser.email,
+				role: existingUser.role,
+				jobType: existingUser.jobType,
+				experienceLevel: existingUser.experienceLevel,
+			},
+			success: true
+		})
 
 
-    } catch (error) {
-        console.error("Error in user login:", error);
-        return res.status(500).json({message:"Internal Server Error"})
-    }
+	} catch (error) {
+		console.error("Error in user login:", error);
+		return res.status(500).json({ message: "Internal Server Error" })
+	}
 }
 
-const getMe = async (req,res) => {
-    
-     try {
-    const user = await User.findById(req.user._id).select(
-      "-password"
-    );
-    
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+const getMe = async (req, res) => {
 
-    res.json({ user });
-  } catch (err) {
-    res.status(500).json({ message: "Failed to fetch user" });
-  }
+	try {
+		const user = await User.findById(req.user._id).select(
+			"-password"
+		);
+
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		res.json(user);
+	} catch (err) {
+		res.status(500).json({ message: "Failed to fetch user" });
+	}
 }
 
 const logoutUser = (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: false 
-  });
+	res.clearCookie("token", {
+		httpOnly: true,
+		sameSite: "lax",
+		secure: false
+	});
 
-  return res.status(200).json({
-    message: "Logged out successfully"
-  });
+	return res.status(200).json({
+		message: "Logged out successfully",
+		success: true
+	});
 };
 
 export { registerUser, loginUser, getMe, logoutUser };

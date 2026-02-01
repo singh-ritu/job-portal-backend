@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const verifyToken = (req, res, next) => {
+export const verifyToken = (req, res, next) => {
   const token = req.cookies?.token;
 
   if (!token) {
@@ -14,11 +14,11 @@ const verifyToken = (req, res, next) => {
       _id: decoded._id,
       role: decoded.role,
     };
-    
+
     next();
   } catch (error) {
     return res.status(401).json({ message: "Unauthorized: Invalid token" });
   }
 };
 
-export default verifyToken;
+
