@@ -80,13 +80,11 @@ const loginUser = async (req, res) => {
 			{ expiresIn: "1d" }
 		);
 
-		console.log(token)
-		console.log("role:", existingUser.role);
 		res.cookie("token", token, {
 			httpOnly: true,
-			secure: false, // true in production
+			secure: false,
 			sameSite: "lax",
-			maxAge: 24 * 60 * 60 * 1000, // 1 day
+			maxAge: 24 * 60 * 60 * 1000,
 			path: "/",
 		});
 

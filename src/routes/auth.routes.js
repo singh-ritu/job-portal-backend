@@ -34,27 +34,30 @@ router.get(
   }),
   (req, res) => {
     const token = generateToken(req.user);
+    console.log("google user:", req.user)
+    const user = req.user
 
-    // 🔑 Store JWT in cookie
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     });
 
-    // 🔑 Role-based redirect
-    if (req?.user?.role) {
-      return res.redirect(`${process.env.FRONTEND_URL}/`);
+    if (!user.role) {
+      return res.redirect(`${process.env.FRONTEND_URL}/selectRole`);
     }
-
-    return res.redirect(`${process.env.FRONTEND_URL}/selectRole`);
+    if (user.role === "jobseeker") {
+      return res.redirect(`${process.env.FRONTEND_URL}/jobseekerDashboard`)
+    } else if (user.role === "employer") {
+      return res.redirect(`${process.env.FRONTEND_URL}/employerDashboard`);
+    }
   }
 );
 
 
 router.post("/setRole", verifyToken, async (req, res) => {
   const { role } = req.body;
-
+  console.log(req.body)
   if (!["employer", "jobseeker"].includes(role)) {
     return res.status(400).json({ message: "Invalid role" });
   }
@@ -66,10 +69,19 @@ router.post("/setRole", verifyToken, async (req, res) => {
   user.role = role;
   await user.save();
 
+  const token = generateToken(user);
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+  });
+
+  console.log("token:", token)
   console.log("user id :", user._id)
 
   if (role === "employer") {
-    // create only if it doesn't exist
+
     await Employer.findOneAndUpdate(
       { userId: user._id },
       {

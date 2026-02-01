@@ -23,7 +23,7 @@ passport.use(
             email,
             authProvider: "google",
             role: null,
-            password: null// 🔑 force role selection
+            password: null
           });
         }
 
