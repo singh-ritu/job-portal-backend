@@ -18,14 +18,20 @@ app.use(express.json());
 connectDB();
 
 app.use(cookieParser());
+
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://job-portal-2rzq.vercel.app",
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      process.env.FRONTEND_URL],
+    origin: allowedOrigins,
     credentials: true,
   })
 );
+
+app.options("*", cors());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
