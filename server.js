@@ -31,8 +31,6 @@ app.use(
   })
 );
 
-app.options("/*", cors());
-
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/upload", uploadRoutes);
