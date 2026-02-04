@@ -45,7 +45,7 @@ router.get(
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     });
-
+    console.log(process.env.FRONTEND_URL)
     if (!user.role) {
       return res.redirect(`${process.env.FRONTEND_URL}/selectRole`);
     }
