@@ -1,12 +1,13 @@
 import express from "express";
 import passport from "passport";
 import '../config/passport.js';
-import { loginUser, registerUser, getMe, logoutUser } from "../controllers/auth.controller.js";
+import { loginUser, registerUser, getMe, logoutUser, resetPassword, newPassword } from "../controllers/auth.controller.js";
 import { verifyToken } from "../middlewares/auth.middleware.js";
 import { generateToken } from "../utils/jwt.js";
 import User from "../models/user.model.js";
 import Employer from "../models/employer.model.js";
 import JobSeeker from "../models/jobSeeker.model.js";
+
 
 const router = express.Router();
 
@@ -14,6 +15,8 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/me", verifyToken, getMe);
 
+router.post("/forgotPassword", resetPassword);
+router.put("/resetPassword/:token", newPassword)
 
 router.post("/logout", logoutUser);
 

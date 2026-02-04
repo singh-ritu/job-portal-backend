@@ -3,7 +3,9 @@ import JobSeeker from "../models/jobSeeker.model.js";
 import Employer from "../models/employer.model.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { USER_ENUMS } from '../enums/user.enums.js'
+import { sendEmail } from "../utils/sendEmail.js";
 
 
 const registerUser = async (req, res) => {
@@ -125,6 +127,71 @@ const getMe = async (req, res) => {
 	}
 }
 
+const resetPassword = async (req, res) => {
+	try {
+		const { email } = req.body;
+
+		if (!email) {
+			return res.status(400).json({ message: "Email is required" })
+		}
+		const user = await User.findOne({ email })
+		if (!user) {
+			return res.status(404).json({ message: "User not found" })
+		}
+
+		const token = crypto.randomBytes(32).toString("hex");
+
+		user.resetPasswordToken = crypto
+			.createHash("sha256")
+			.update(token)
+			.digest("hex");
+
+		user.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+
+		await user.save();
+
+		const resetUrl = `http://localhost:3000/resetPassword/${token}`;
+
+		await sendEmail({
+			to: user.email,
+			subject: "Password Reset Request",
+			text: `You requested a password reset. Click the link to reset your password: ${resetUrl}`,
+		})
+		return res.status(200).json({ message: "Password reset email sent", success: true })
+	} catch (error) {
+		return res.status(500).json({ message: "Internal Server Error" })
+	}
+}
+
+const newPassword = async (req, res) => {
+	try {
+		const resetToken = crypto
+			.createHash("sha256")
+			.update(req.params.token)
+			.digest("hex");
+
+		const user = await User.findOne({
+			resetPasswordToken: resetToken,
+			resetPasswordExpire: { $gt: Date.now() },
+		});
+
+		if (!user) {
+			return res.status(400).json({ message: "Invalid token" });
+		}
+
+		user.password = await bcrypt.hash(req.body.password, 10);
+
+		user.resetPasswordToken = undefined;
+		user.resetPasswordExpire = undefined;
+
+		await user.save();
+
+		res.json({ success: true });
+	} catch (error) {
+		return res.status(500).json({ message: "Internal Server Error" })
+	}
+}
+
 const logoutUser = (req, res) => {
 	res.clearCookie("token", {
 		httpOnly: true,
@@ -138,4 +205,4 @@ const logoutUser = (req, res) => {
 	});
 };
 
-export { registerUser, loginUser, getMe, logoutUser };
+export { registerUser, loginUser, getMe, resetPassword, newPassword, logoutUser };

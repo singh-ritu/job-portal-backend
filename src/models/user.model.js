@@ -20,6 +20,14 @@ const userSchema = new mongoose.Schema({
             return this.authProvider === "local";
         },
     },
+    resetPasswordToken: {
+        type: String,
+        default: null,
+    },
+    resetPasswordExpire: {
+        type: Date,
+        default: null,
+    },
     role: {
         type: String,
         enum: [USER_ENUMS.EMPLOYER, USER_ENUMS.JOB_SEEKER],
