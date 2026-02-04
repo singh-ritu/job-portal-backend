@@ -15,8 +15,8 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/me", verifyToken, getMe);
 
-router.post("/forgotPassword", resetPassword);
-router.put("/resetPassword/:token", newPassword)
+router.post("/forgot-Password", resetPassword);
+router.put("/reset-Password/:token", newPassword)
 
 router.post("/logout", logoutUser);
 
